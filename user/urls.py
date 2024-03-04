@@ -1,15 +1,14 @@
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import path
 from rest_framework.routers import SimpleRouter
 from hvdc.views import PingAPIView
+from user.views import LoginAPIView
 
 router = SimpleRouter()
 
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', PingAPIView.as_view()),
-    path('api/user/',  include('user.urls')),
+    path('login/', LoginAPIView.as_view()),
 ]
 

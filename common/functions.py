@@ -1,5 +1,4 @@
 from django.conf import settings
-from twilio.rest import Client
 
 
 # Serializers Error Messages Modified
