@@ -11,5 +11,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', PingAPIView.as_view()),
     path('api/user/',  include('user.urls')),
+    path('api/pathology/',  include('pathology.urls')),
 ]
 
