@@ -1,10 +1,9 @@
 import uuid
 from django.db import models
-
+from common.models import BaseModel
 # Create your models here.
 
-
-class Pathology(models.Model):
+class Pathology(BaseModel):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
     description = models.TextField()

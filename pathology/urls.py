@@ -1,7 +1,10 @@
-from django.urls import path
-from pathology.api.Pathology import PathologyList, PathologyDetail
+from django.urls import path, include
+from pathology.api.views import PathologyViewSet
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register(r'pathologies', PathologyViewSet)
 
 urlpatterns = [
-    path('pathologies/', PathologyList.as_view(), name='pathology-list'),
-    path('pathologies/<uuid:uuid>/', PathologyDetail.as_view(), name='pathology-detail'),
+    path('', include(router.urls)),
 ]
