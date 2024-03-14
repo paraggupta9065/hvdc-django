@@ -18,3 +18,12 @@ class Pathology(BaseModel):
     email = models.EmailField(max_length=100, blank=True, null=True)
     is_offline = models.BooleanField(default=False)
 
+
+class Banner(BaseModel):
+    title = models.CharField(max_length=100)
+    image = models.ImageField(upload_to='banners/')
+    link = models.URLField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
