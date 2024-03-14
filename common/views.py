@@ -10,6 +10,15 @@ from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
 
 
+# for the banner 
+from rest_framework import generics
+from hvdc.models import Banner
+from hvdc.serializers import BannerSerializer
+
+
+
+
+
 from common.pagination import CustomPagination
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.exceptions import PermissionDenied
@@ -165,3 +174,8 @@ class BaseAPIView(APIView, PageNumberPagination):
 
 class PublicAPIView(APIView):
     permission_classes = [AllowAny]
+
+
+class BannerListsView(generics.ListAPIView):
+    queryset = Banner.objects.all()
+    serializer_class = BannerSerializer
