@@ -42,3 +42,16 @@ class Category_model(BaseModel):
 
     
     
+
+# Pharmacy 
+     
+class Pharmacy(BaseModel):
+    pharmacyName = models.CharField(max_length=100)
+    description = models.TextField(blank=True,null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now= True)
+    email = models.EmailField()
+    phone_number = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.pharmacyName
