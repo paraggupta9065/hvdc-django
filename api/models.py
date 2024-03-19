@@ -31,7 +31,7 @@ class Banner(BaseModel):
 
 # Category model 
 
-class Category_model(BaseModel):
+class Category(BaseModel):
     categoryName = models.CharField(max_length=100)
     description = models.TextField(blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -39,19 +39,24 @@ class Category_model(BaseModel):
 
     def __str__(self):
         return self.categoryName
-
     
+class PathologyTest(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    test_type = models.CharField(max_length=50)
+    # preparation_instructions = models.ArrayField(models.TextField(blank=True, null=True))
+    pathology = models.ForeignKey(Pathology,on_delete=models.CASCADE)
+    category = models.ForeignKey(Category,on_delete=models.CASCADE)
+    price = models.IntegerField(null=False)
+    is_offline = models.BooleanField(default=True)
     
+class PathologyPackage(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    # preparation_instructions = models.ArrayField(models.TextField(blank=True, null=True))
+    pathology = models.ForeignKey(Pathology,on_delete=models.CASCADE)
+    category = models.ForeignKey(Category,on_delete=models.CASCADE)
+    regular_price = models.IntegerField(null=False)
+    price = models.IntegerField(null=False)
 
-# Pharmacy 
-     
-class Pharmacy(BaseModel):
-    pharmacyName = models.CharField(max_length=100)
-    description = models.TextField(blank=True,null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now= True)
-    email = models.EmailField()
-    phone_number = models.CharField(max_length=20)
 
-    def __str__(self):
-        return self.pharmacyName

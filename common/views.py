@@ -12,7 +12,7 @@ from rest_framework.exceptions import ValidationError
 
 # for the banner 
 from rest_framework import generics
-from hvdc.serializers import BannerSerializer
+from api.serializers import BannerSerializer
 
 
 
