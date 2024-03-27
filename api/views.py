@@ -1,10 +1,12 @@
 
-from api.models import Banner, Category, Pathology, PathologyPackage, PathologyTest
-from common.views import BaseViewSet, PublicAPIView
+from api.models import Banner, Category, PathologyPackage, PathologyTest
+from common.views import BaseAPIView, BaseViewSet, PublicAPIView
 from api.serializers import BannerSerializer, CategorySerializer, PathologyPackageSerializer, PathologySerializer, PathologyTestSerializer
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import api_view , status
+from user.models import Pathology
+
 
 class PathologyViewSet(BaseViewSet):
     queryset = Pathology.objects.all()
@@ -41,7 +43,7 @@ class PathologyPackageViewSet(BaseViewSet):
 
 
 # banner view
-class BannerView(PublicAPIView):
+class BannerView(BaseAPIView):
     queryset = Banner.objects.all()
     serializer_class = BannerSerializer
     
@@ -55,7 +57,7 @@ class BannerView(PublicAPIView):
         
 
 # category view
-class CategoryView(PublicAPIView):
+class CategoryView(BaseAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 

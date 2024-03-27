@@ -1,6 +1,7 @@
 
-from api.models import Banner, Category, Pathology, PathologyPackage, PathologyTest
+from api.models import Banner, Category, PathologyPackage, PathologyTest
 from rest_framework import serializers
+from user.models import Pathology
 
 
 class BannerSerializer(serializers.ModelSerializer):
