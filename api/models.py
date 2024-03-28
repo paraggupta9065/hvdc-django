@@ -17,13 +17,15 @@ class Banner(BaseModel):
 # Category model 
 
 class Category(BaseModel):
-    categoryName = models.CharField(max_length=100)
+    category_name = models.CharField(max_length=100)
     description = models.TextField(blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now= True)
+    image = models.ImageField(upload_to='categories/')
+    
 
     def __str__(self):
-        return self.categoryName
+        return self.category_name
     
 class PathologyTest(models.Model):
     name = models.CharField(max_length=100)
