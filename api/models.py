@@ -21,7 +21,7 @@ class Category(BaseModel):
     description = models.TextField(blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now= True)
-    image = models.ImageField(upload_to='categories/')
+    image = models.ImageField(upload_to='categories/',null=False,default="r")
     
 
     def __str__(self):
