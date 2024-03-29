@@ -1,7 +1,7 @@
 import uuid
 from django.db import models
 from common.models import BaseModel
-from user.models import Pathology
+from user.models import Pathology, User
 # Create your models here.
 
 class Banner(BaseModel):
@@ -34,16 +34,28 @@ class PathologyTest(models.Model):
     # preparation_instructions = models.ArrayField(models.TextField(blank=True, null=True))
     pathology = models.ForeignKey(Pathology,on_delete=models.CASCADE)
     category = models.ForeignKey(Category,on_delete=models.CASCADE)
+    regular_price = models.IntegerField(null=False,default = 0)
     price = models.IntegerField(null=False)
-    is_offline = models.BooleanField(default=True)
+    is_offline = models.BooleanField(default=False)
     
 class PathologyPackage(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     # preparation_instructions = models.ArrayField(models.TextField(blank=True, null=True))
     pathology = models.ForeignKey(Pathology,on_delete=models.CASCADE)
+    tests = models.ManyToManyField('PathologyTest')
     category = models.ForeignKey(Category,on_delete=models.CASCADE)
     regular_price = models.IntegerField(null=False)
     price = models.IntegerField(null=False)
 
+class Cart(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    tests = models.ManyToManyField('PathologyTest')
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    def total_price(self):
+        total = 0
+        for test in self.tests.all():
+            total += test.price
+        return total
 
