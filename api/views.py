@@ -158,9 +158,14 @@ class CartViewSet(BaseViewSet):
                 try:
                         user = self.request.user
                         cart = Cart.objects.get(user=request.user)
+                        cart_total = cart.total_price()
                         
                         serializer = self.get_serializer(cart)
-                        return Response({"results":serializer.data})
+                        return Response({"results":{
+                                "cart":serializer.data,
+                                "cart_total":cart_total,
+                                
+                        }})
                 except Cart.DoesNotExist as ex:
                         return Response(
                                 {"detail": "Cart Does not Exist!"}, status=status.HTTP_404_NOT_FOUND
