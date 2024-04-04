@@ -1,11 +1,20 @@
 
-from api.models import Banner, Category, PathologyPackage, PathologyTest
+from api.models import Banner, Cart, Category, PathologyPackage, PathologyTest
+from common.functions import serailizer_errors
 from common.views import BaseAPIView, BaseViewSet, PublicAPIView
-from api.serializers import BannerSerializer, CategorySerializer, PathologyPackageSerializer, PathologySerializer, PathologyTestSerializer
+from api.serializers import BannerSerializer, CartSerializer, CategorySerializer, PathologyPackageSerializer, PathologySerializer, PathologyTestSerializer
 from rest_framework import viewsets
 from rest_framework.response import Response
 from user.models import Pathology
 from django.db.models import Q
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework import status
+from rest_framework.exceptions import APIException
+from rest_framework.exceptions import ValidationError
+
+
+
+
 
 class PathologyViewSet(BaseViewSet):
     queryset = Pathology.objects.all()
@@ -13,10 +22,7 @@ class PathologyViewSet(BaseViewSet):
     
     def get_queryset(self):
             return self.queryset
-    
-    def get(self,request):
-        data =self.serializer_class(self.get_queryset().all(),many=True)
-        return Response({"results":data.data})
+
 
 class PathologyTestView(BaseAPIView):
     queryset = PathologyTest.objects.all()
@@ -34,7 +40,7 @@ class PathologyTestView(BaseAPIView):
                 )
         category_id = self.request.query_params.get("category")
         if(category_id):
-                print(category_id)
+                
                 self.queryset = self.queryset.filter(
                      category = category_id
                 )
@@ -52,7 +58,7 @@ class PathologyTestView(BaseAPIView):
     
     def get(self,request):
         queryset_data = self.get_queryset()
-        db_data =self.serializer_class(queryset_data,many=True)
+        db_data =self.serializer_class(queryset_data,many=True,context={'request': request})
         return Response({"results":db_data.data})
 
 class PathologyPackageViewSet(BaseViewSet):
@@ -93,4 +99,72 @@ class CategoryView(BaseAPIView):
         data =self.serializer_class(self.get_queryset().all(),many=True)
         return Response({"results":data.data})
     
+# cart view                
+class CartViewSet(BaseViewSet):
+        queryset = Cart.objects.all()
+        serializer_class = CartSerializer
 
+        def get_queryset(self):
+                return self.queryset
+        
+        def validate_test(self,cart,test_id):
+                tests= cart.tests.all()
+                if(tests.count()==0):
+                        return True
+                current_test = tests.first()
+                try:
+                        test = PathologyTest.objects.get(id=test_id)
+                except:
+                        return Response(
+                                {"detail": f"Test Not Found !"},
+                                status=status.HTTP_400_BAD_REQUEST,
+                        )
+                if(current_test.pathology==test.pathology and current_test.is_offline!=test.is_offline):
+                        raise ValidationError(f"Previous Test in Your Cart Is {current_test.is_offline} Please Add Same Test Or Clear Cart !")
+                
+                return (current_test.pathology==test.pathology)
+        def create(self, request,):
+                try:
+                        test_id = request.data.get('test')
+                        
+                        if(not test_id):
+                                raise ValidationError("Test Id Not Found!")
+                                
+                        try:
+                                cart = Cart.objects.get(user=request.user)
+                        except:
+                                cart = Cart.objects.create(user=request.user)
+                                
+                        
+                        valid = self.validate_test(cart,test_id)
+                        
+                        if(valid):
+                                cart.tests.set([test_id])
+                                return Response({"detail":"Test added in cart!"})
+                        else:
+                                return Response(
+                                {"detail": "Invalid Data!"},
+                                status=status.HTTP_400_BAD_REQUEST,
+                        )
+                except ValidationError as e:
+                        field_name, error_message = serailizer_errors(e)
+                        return Response(
+                                {"detail": f"{field_name} - {error_message}"},
+                                status=status.HTTP_400_BAD_REQUEST,
+                        )
+                except Exception as ex:
+                        raise APIException(detail=ex)
+        def list(self, request, *args, **kwargs):
+                try:
+                        user = self.request.user
+                        cart = Cart.objects.get(user=request.user)
+                        
+                        serializer = self.get_serializer(cart)
+                        return Response({"results":serializer.data})
+                except Cart.DoesNotExist as ex:
+                        return Response(
+                                {"detail": "Cart Does not Exist!"}, status=status.HTTP_404_NOT_FOUND
+                        )
+                        
+                except Exception as ex:
+                        raise APIException(detail=ex)

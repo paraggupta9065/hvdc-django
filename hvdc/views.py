@@ -8,5 +8,5 @@ from rest_framework.response import Response
 
 class PingAPIView(PublicAPIView):
     def get(self, request):
-        return Response({"detail":"Server Up And Running!"})
+        return Response({"detail":"Pong, Server Up And Running!"})
     

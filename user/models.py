@@ -1,7 +1,21 @@
+from datetime import datetime 
 from django.db import models
 from common.models import BaseModel
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import BaseUserManager
+from django.contrib.postgres.fields import ArrayField
+
+from django.db import models
+
+DAY_MAPPING = {
+    0: 'Monday',
+    1: 'Tuesday',
+    2: 'Wednesday',
+    3: 'Thursday',
+    4: 'Friday',
+    5: 'Saturday',
+    6: 'Sunday',
+}
 
 class Pathology(BaseModel):
     name = models.CharField(max_length=100)
@@ -15,6 +29,10 @@ class Pathology(BaseModel):
     phone = models.CharField(max_length=20, blank=True, null=True)
     email = models.EmailField(max_length=100, blank=True, null=True)
     is_offline = models.BooleanField(default=False)
+    working_days = ArrayField(models.IntegerField(), size=7,null=False,default=[0,1,2,3,4,5,6])
+    not_working_dates = ArrayField(models.DateTimeField(auto_now_add=True),null=False,default=[datetime.now()])
+    def __str__(self):
+        return self.name
 
 
 class CustomUserManager(BaseUserManager):

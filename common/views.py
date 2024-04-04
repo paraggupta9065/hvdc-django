@@ -23,12 +23,6 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.exceptions import PermissionDenied
 from rest_framework import status
 
-from common.permissions import (
-    IsActiveUser,
-    IsSuperAdmin,
-    IsAdminOrSuperAdminOrEditor,
-    IsAdminOrSuperAdmin,
-)
 from common.functions import serailizer_errors
 
 CACHE_INTERVAL = 0
@@ -41,18 +35,7 @@ class BaseViewSet(ModelViewSet):
     pagination_class = CustomPagination
 
     def get_permissions(self):
-        if self.action in [
-            "list",
-            "retrieve",
-        ]:
-            permission_classes = [IsAuthenticated]
-        elif self.action in ["update"]:
-            permission_classes = [IsAdminOrSuperAdminOrEditor]
-        else:
-            permission_classes = [IsAdminOrSuperAdmin]
-
-        permission_classes += [IsActiveUser]
-
+        permission_classes = [IsAuthenticated]
         return [permission() for permission in permission_classes]
 
     @method_decorator(cache_page(CACHE_INTERVAL, cache="default"))
@@ -60,12 +43,7 @@ class BaseViewSet(ModelViewSet):
         return super(BaseViewSet, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        # Filter objects based on the user (current user)
-        user = self.request.user
-        if self.request.user.role == "superadmin":
-            return self.queryset.filter(created_by=user)
-        else:
-            return self.queryset.filter(users__in=[user])
+            return self.queryset.all()
 
     def get_serializer_context(self):
         """
@@ -77,7 +55,7 @@ class BaseViewSet(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         try:
-            self.queryset = self.filter_queryset(self.get_queryset()).order_by("-created_on")
+            self.queryset = self.filter_queryset(self.get_queryset())
 
             if self.pagination:
                 page = self.paginate_queryset(self.queryset)
@@ -161,13 +139,7 @@ class BaseAPIView(APIView, PageNumberPagination):
     pagination_class = CustomPagination
 
     def get_permissions(self):
-        if self.request.method in ["GET", "HEAD"]:
-            permission_classes = [IsAuthenticated]
-        elif self.request.method in ["PUT", "HEAD"]:
-            permission_classes = [IsAdminOrSuperAdminOrEditor]
-        else:
-            permission_classes = [IsAdminOrSuperAdmin]
-        permission_classes += [IsActiveUser]
+        permission_classes = [IsAuthenticated]
         return [permission() for permission in permission_classes]
 
 

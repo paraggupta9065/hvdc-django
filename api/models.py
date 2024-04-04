@@ -26,6 +26,20 @@ class Category(BaseModel):
 
     def __str__(self):
         return self.category_name
+
+class InCartField(models.BooleanField):
+    description = "Indicates whether the test is in the cart for a specific user"
+
+    def contribute_to_class(self, cls, name, private_only=False):
+        super().contribute_to_class(cls, name, private_only=private_only)
+        models.signals.post_save.connect(self.update_in_cart, sender=cls)
+
+    def update_in_cart(self, sender, instance, **kwargs):
+        
+        if hasattr(instance, 'cart'):
+            instance.in_cart = instance.cart.tests.filter(pk=instance.pk).exists()
+        else:
+            instance.in_cart = True
     
 class PathologyTest(models.Model):
     name = models.CharField(max_length=100)
@@ -37,6 +51,9 @@ class PathologyTest(models.Model):
     regular_price = models.IntegerField(null=False,default = 0)
     price = models.IntegerField(null=False)
     is_offline = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return self.name
     
 class PathologyPackage(models.Model):
     name = models.CharField(max_length=100)
