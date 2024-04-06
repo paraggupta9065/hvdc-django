@@ -2,11 +2,11 @@ import requests
 from common.views import BaseAPIView, BaseViewSet, PublicAPIView
 from rest_framework.response import Response
 from rest_framework import status
-from user.models import Notification, User
+from user.models import Address, Notification, Patient, User
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from django.db import transaction
 
-from user.serializers import NotificationSerializer, UserSerializer
+from user.serializers import AddressSerializer, NotificationSerializer, PatientSerializer, UserSerializer
 
 
 
@@ -75,3 +75,17 @@ class NotificationAPIView(BaseAPIView):
         except Exception as e:
             print(e)
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class PatientViewSet(BaseViewSet):
+        queryset = Patient.objects.all()
+        serializer_class = PatientSerializer
+
+        def get_queryset(self):
+                return self.queryset.filter(user=self.request.user)
+
+class AddressViewSet(BaseViewSet):
+        queryset = Address.objects.all()
+        serializer_class = AddressSerializer
+
+        def get_queryset(self):
+                return self.queryset.filter(user=self.request.user)

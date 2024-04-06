@@ -55,15 +55,21 @@ class PathologyTest(models.Model):
     def __str__(self):
         return self.name
     
+class PathologyPackageTest(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+
 class PathologyPackage(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     # preparation_instructions = models.ArrayField(models.TextField(blank=True, null=True))
     pathology = models.ForeignKey(Pathology,on_delete=models.CASCADE)
-    tests = models.ManyToManyField('PathologyTest')
+    tests = models.ManyToManyField(PathologyPackageTest)
     category = models.ForeignKey(Category,on_delete=models.CASCADE)
     regular_price = models.IntegerField(null=False)
     price = models.IntegerField(null=False)
+    
+
 
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

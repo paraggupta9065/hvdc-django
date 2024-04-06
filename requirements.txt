@@ -8,3 +8,4 @@ djangorestframework-simplejwt
 python-dotenv
 psycopg2
 pillow
+django-cors-headers

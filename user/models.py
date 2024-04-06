@@ -79,3 +79,26 @@ class Notification(models.Model):
     type_id = models.CharField(max_length=255)
     user = models.ForeignKey(
         User, null=True, blank=True, on_delete=models.SET_NULL)
+
+class Patient(models.Model):
+    GENDER_CHOICES = (
+        ('M', 'Male'),
+        ('F', 'Female'),
+        ('O', 'Other'),
+    )
+    name = models.CharField(max_length=100)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+    phone_number = models.CharField(max_length=15, blank=True)
+    user = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.SET_NULL)
+    
+    def __str__(self):
+        return self.name
+
+class Address(models.Model):
+    street = models.CharField(max_length=255)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    postal_code = models.CharField(max_length=20)
+    def __str__(self):
+        return f"{self.street}, {self.city}, {self.state}, {self.postal_code}"
