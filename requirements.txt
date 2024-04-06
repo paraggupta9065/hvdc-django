@@ -6,6 +6,5 @@ sqlparse==0.4.4
 requests
 djangorestframework-simplejwt
 python-dotenv
-psycopg2
 pillow
 django-cors-headers
