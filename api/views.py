@@ -139,8 +139,8 @@ class CartViewSet(BaseViewSet):
                         valid = self.validate_test(cart,test_id)
                         
                         if(valid):
-                                cart.tests.set([test_id])
-                                return Response({"detail":"Test added in cart!"})
+                                cart.tests.add([test_id])
+                                return Response({"detail":"Test added in cart!"},    status=status.HTTP_200_Ok,)
                         else:
                                 return Response(
                                 {"detail": "Invalid Data!"},
