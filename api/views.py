@@ -115,10 +115,7 @@ class CartViewSet(BaseViewSet):
                 try:
                         test = PathologyTest.objects.get(id=test_id)
                 except:
-                        return Response(
-                                {"detail": f"Test Not Found !"},
-                                status=status.HTTP_400_BAD_REQUEST,
-                        )
+                        raise ValidationError(f"Test Not Found !")
                 if(current_test.pathology==test.pathology and current_test.is_offline!=test.is_offline):
                         raise ValidationError(f"Previous Test in Your Cart Is {current_test.is_offline} Please Add Same Test Or Clear Cart !")
                 
@@ -138,14 +135,11 @@ class CartViewSet(BaseViewSet):
                         
                         valid = self.validate_test(cart,test_id)
                         
-                        if(valid):
-                                cart.tests.add([test_id])
-                                return Response({"detail":"Test added in cart!"},    status=status.HTTP_200_Ok,)
+                        if(valid==True):
+                                cart.tests.add(test_id)
+                                return Response({"detail":"Test added in cart!"},    status=status.HTTP_200_OK,)
                         else:
-                                return Response(
-                                {"detail": "Invalid Data!"},
-                                status=status.HTTP_400_BAD_REQUEST,
-                        )
+                                return valid
                 except ValidationError as e:
                         field_name, error_message = serailizer_errors(e)
                         return Response(
