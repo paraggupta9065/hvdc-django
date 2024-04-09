@@ -51,6 +51,8 @@ class PathologyTest(models.Model):
     regular_price = models.IntegerField(null=False,default = 0)
     price = models.IntegerField(null=False)
     is_offline = models.BooleanField(default=False)
+    pathology_list = models.ManyToManyField(Pathology,null=True,blank=True,related_name="test_pathology_list")
+    
     
     def __str__(self):
         return self.name

@@ -167,3 +167,23 @@ class CartViewSet(BaseViewSet):
                         
                 except Exception as ex:
                         raise APIException(detail=ex)
+
+
+# Pathlogy view
+class PathlogyView(BaseAPIView):
+    queryset = Pathology.objects.all()
+    serializer_class = PathologySerializer
+
+    def get_queryset(self,request):
+        is_offline_param = request.query_params.get("is_offline")
+            
+        if(is_offline_param):
+                is_offline = False
+                if(is_offline_param == 'true'): is_offline = True
+                self.queryset = self.queryset.filter(is_offline=is_offline)
+                
+        return self.queryset
+    
+    def get(self,request):
+        data =self.serializer_class(self.get_queryset(request=request).all(),many=True)
+        return Response({"results":data.data})
