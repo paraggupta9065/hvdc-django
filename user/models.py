@@ -89,6 +89,8 @@ class Patient(BaseModel):
     name = models.CharField(max_length=100)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     phone_number = models.CharField(max_length=15, blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    
     
     def __str__(self):
         return self.name
@@ -98,5 +100,7 @@ class Address(BaseModel):
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
     postal_code = models.CharField(max_length=20)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    
     def __str__(self):
         return f"{self.street}, {self.city}, {self.state}, {self.postal_code}"
