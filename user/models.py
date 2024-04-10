@@ -80,7 +80,7 @@ class Notification(models.Model):
     user = models.ForeignKey(
         User, null=True, blank=True, on_delete=models.SET_NULL)
 
-class Patient(models.Model):
+class Patient(BaseModel):
     GENDER_CHOICES = (
         ('M', 'Male'),
         ('F', 'Female'),
@@ -89,13 +89,11 @@ class Patient(models.Model):
     name = models.CharField(max_length=100)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     phone_number = models.CharField(max_length=15, blank=True)
-    user = models.ForeignKey(
-        User, null=True, blank=True, on_delete=models.SET_NULL)
     
     def __str__(self):
         return self.name
 
-class Address(models.Model):
+class Address(BaseModel):
     street = models.CharField(max_length=255)
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
