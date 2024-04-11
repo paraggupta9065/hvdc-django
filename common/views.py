@@ -97,9 +97,9 @@ class BaseViewSet(ModelViewSet):
 
             return Response(serializer.data)
         except ValidationError as e:
-            field_name, error_message = serailizer_errors(e)
+            error_message = serailizer_errors(e)
             return Response(
-                {"detail": f"{field_name} - {error_message}"},
+                {"detail": error_message},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -127,11 +127,13 @@ class BaseViewSet(ModelViewSet):
                 headers=headers,
             )
         except ValidationError as e:
-            field_name, error_message = serailizer_errors(e)
+            error_message = serailizer_errors(e)
             return Response(
-                {"detail": f"{field_name} - {error_message}"},
+                {"detail": error_message},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        except Exception as e:
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class BaseAPIView(APIView, PageNumberPagination):

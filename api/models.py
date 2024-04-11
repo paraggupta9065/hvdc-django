@@ -1,7 +1,7 @@
 import uuid
 from django.db import models
 from common.models import BaseModel
-from user.models import Pathology, User
+from user.models import Address, Pathology, Patient, User
 # Create your models here.
 
 class Banner(BaseModel):
@@ -77,6 +77,19 @@ class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tests = models.ManyToManyField('PathologyTest')
     date_added = models.DateTimeField(auto_now_add=True)
+
+    def total_price(self):
+        total = 0
+        for test in self.tests.all():
+            total += test.price
+        return total
+
+class Order(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    tests = models.ManyToManyField('PathologyTest')
+    date_added = models.DateTimeField(auto_now_add=True)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    address = models.ForeignKey(Address, on_delete=models.CASCADE)
 
     def total_price(self):
         total = 0

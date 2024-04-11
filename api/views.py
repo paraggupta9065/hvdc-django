@@ -1,16 +1,18 @@
 
-from api.models import Banner, Cart, Category, PathologyPackage, PathologyTest
+from api.models import Banner, Cart, Category, Order, PathologyPackage, PathologyTest
 from common.functions import serailizer_errors
 from common.views import BaseAPIView, BaseViewSet, PublicAPIView
-from api.serializers import BannerSerializer, CartSerializer, CategorySerializer, PathologyPackageSerializer, PathologySerializer, PathologyTestSerializer
+from api.serializers import BannerSerializer, CartSerializer, CategorySerializer, OrderSerializer, PathologyPackageSerializer, PathologySerializer, PathologyTestSerializer
 from rest_framework import viewsets
 from rest_framework.response import Response
-from user.models import Pathology
+from user.models import Address, Pathology, Patient
 from django.db.models import Q
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from rest_framework.exceptions import APIException
 from rest_framework.exceptions import ValidationError
+from django.db import transaction
+
 
 
 
@@ -141,9 +143,9 @@ class CartViewSet(BaseViewSet):
                         else:
                                 return valid
                 except ValidationError as e:
-                        field_name, error_message = serailizer_errors(e)
+                        error_message = serailizer_errors(e)
                         return Response(
-                                {"detail": f"{field_name} - {error_message}"},
+                                {"detail": error_message},
                                 status=status.HTTP_400_BAD_REQUEST,
                         )
                 except Exception as ex:
@@ -187,3 +189,41 @@ class PathlogyView(BaseAPIView):
     def get(self,request):
         data =self.serializer_class(self.get_queryset(request=request).all(),many=True)
         return Response({"results":data.data})
+
+class OrderViewSet(BaseViewSet):
+        queryset = Order.objects.all()
+        serializer_class = OrderSerializer
+
+        def get_queryset(self):
+                return self.queryset.filter(user=self.request.user)
+        
+        def create(self, request, *args, **kwargs):
+                try:
+                        address = request.data.get("address")
+                        patient = request.data.get("patient")
+                        with transaction.atomic():
+                                user = request.user
+                                if(not address or not patient):
+                                        raise ValidationError(f"Address Or Patient Is Required!")
+
+                                cart = Cart.objects.get(user=request.user)
+                                
+                                order = Order.objects.create(user=request.user, date_added = cart.date_added,patient = Patient.objects.get(id=patient),address = Address.objects.get(id=address),)
+                                order.tests.set(cart.tests.all())
+                                order.save()
+                                
+                                return Response(
+                                        {"detail": "Successfully Created!"},
+                                        status=status.HTTP_201_CREATED,
+                                )
+                except Cart.DoesNotExist as e:
+                        return Response({"detail": "Cart Not Found !"},status=status.HTTP_400_BAD_REQUEST,)
+                        
+                except ValidationError as e:
+                        error_message = serailizer_errors(e)
+                        return Response(
+                                {"detail": error_message},
+                                status=status.HTTP_400_BAD_REQUEST,
+                        )
+                except Exception as e:
+                        return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
