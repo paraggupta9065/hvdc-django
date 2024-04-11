@@ -81,11 +81,11 @@ class PatientViewSet(BaseViewSet):
         serializer_class = PatientSerializer
 
         def get_queryset(self):
-                return self.queryset.filter(user=self.request.user)
+                return self.queryset.filter(created_by=self.request.user)
 
 class AddressViewSet(BaseViewSet):
         queryset = Address.objects.all()
         serializer_class = AddressSerializer
 
         def get_queryset(self):
-                return self.queryset.filter(user=self.request.user)
+                return self.queryset.filter(created_by=self.request.user)
