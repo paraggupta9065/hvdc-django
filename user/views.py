@@ -46,6 +46,7 @@ class LoginAPIView(PublicAPIView):
                 access_token = str(refresh.access_token)
                 return Response({'access_token': access_token, 'refresh_token': str(refresh)}, status=status.HTTP_200_OK)
         except Exception as e:
+            print(e)
             return Response({'detail': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
             
 class ProfileAPIView(BaseAPIView):

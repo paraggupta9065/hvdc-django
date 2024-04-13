@@ -90,6 +90,7 @@ class Order(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     address = models.ForeignKey(Address, on_delete=models.CASCADE)
+    slot_time = models.DateTimeField()
 
     def total_price(self):
         total = 0

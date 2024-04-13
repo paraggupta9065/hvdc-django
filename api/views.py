@@ -1,4 +1,4 @@
-
+from rest_framework.decorators import action
 from api.models import Banner, Cart, Category, Order, PathologyPackage, PathologyTest
 from common.functions import serailizer_errors
 from common.views import BaseAPIView, BaseViewSet, PublicAPIView
@@ -216,6 +216,28 @@ class OrderViewSet(BaseViewSet):
                                         {"detail": "Successfully Created!"},
                                         status=status.HTTP_201_CREATED,
                                 )
+                except Cart.DoesNotExist as e:
+                        return Response({"detail": "Cart Not Found !"},status=status.HTTP_400_BAD_REQUEST,)
+                        
+                except ValidationError as e:
+                        error_message = serailizer_errors(e)
+                        return Response(
+                                {"detail": error_message},
+                                status=status.HTTP_400_BAD_REQUEST,
+                        )
+                except Exception as e:
+                        return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                
+
+        @action(detail=False, methods=["delete"])
+        def get_slots(self, request,):
+                try:
+                        pathology_id = request.data.get("pathology")
+                        pathology = Pathology.objects.get(id=pathology_id)
+                        orders = Order.objects.filter(tests__pathology_id=pathology_id)
+                        print(orders)
+                        
+                        pass
                 except Cart.DoesNotExist as e:
                         return Response({"detail": "Cart Not Found !"},status=status.HTTP_400_BAD_REQUEST,)
                         
