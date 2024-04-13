@@ -76,7 +76,7 @@ class Slot(models.Model):
     month = models.IntegerField(choices=[(i, i) for i in range(1,13)])
     year = models.IntegerField()
     hour = models.IntegerField(choices=[(i, i) for i in range(1,25)])
-    minute = models.IntegerField(choices=[(i, i) for i in range(1,61)])
+    minute = models.IntegerField(choices=[(i, i) for i in range(0,60)])
     pathology = models.ForeignKey(Pathology,on_delete=models.CASCADE)
 
     def __str__(self):

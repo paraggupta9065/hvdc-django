@@ -212,7 +212,6 @@ class OrderViewSet(BaseViewSet):
                                 request.data['pathology'] = pathology=cart.tests.all().first().pathology.id
                                 slot.is_valid(raise_exception=True)
                                 slot = slot.save()
-                                print(slot)
                                 
                                 order = Order.objects.create(slot =slot ,user=request.user, date_added = cart.date_added,patient = Patient.objects.get(id=patient),address = Address.objects.get(id=address),)
                                 order.tests.set(cart.tests.all())
