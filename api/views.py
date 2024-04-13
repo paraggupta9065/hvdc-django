@@ -1,5 +1,5 @@
 from rest_framework.decorators import action
-from api.models import Banner, Cart, Category, Order, PathologyPackage, PathologyTest
+from api.models import Banner, Cart, Category, Order, PathologyPackage, PathologyTest, Slot
 from common.functions import serailizer_errors
 from common.views import BaseAPIView, BaseViewSet, PublicAPIView
 from api.serializers import BannerSerializer, CartSerializer, CategorySerializer, OrderSerializer, PathologyPackageSerializer, PathologySerializer, PathologyTestSerializer
@@ -229,14 +229,25 @@ class OrderViewSet(BaseViewSet):
                         return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
                 
 
-        @action(detail=False, methods=["delete"])
+        @action(detail=False, methods=["get"])
         def get_slots(self, request,):
                 try:
-                        pathology_id = request.data.get("pathology")
-                        pathology = Pathology.objects.get(id=pathology_id)
-                        orders = Order.objects.filter(tests__pathology_id=pathology_id)
-                        print(orders)
-                        
+                        slot_times = [i  for i in range(9,18)]
+                        day = request.query_params.get("day")
+                        month = request.query_params.get("month")
+                        year = request.query_params.get("year")
+                        cart = Cart.objects.get(user=request.user)
+                        pathology = cart.tests.all().first().pathology
+                        current_slots = Slot.objects.filter(pathology=pathology,month=month,day=day,year = year)
+                        for current_slot in current_slots:
+                                slot_times.remove(current_slot.hour)
+                                
+                        return Response({"results": {
+                                "slots":slot_times,
+                                "day":day,
+                                "month":month,
+                                "year":year,
+                        }})
                         pass
                 except Cart.DoesNotExist as e:
                         return Response({"detail": "Cart Not Found !"},status=status.HTTP_400_BAD_REQUEST,)

@@ -36,7 +36,7 @@ class LoginAPIView(PublicAPIView):
                 user = User.objects.filter(google_id=id,email=email).first()
                 if(not user):
                     user =  User.objects.create(
-                        name = f'{response_data["name"]} {response_data["family_name"]}',
+                        name = f'{response_data["given_name"]} {response_data["family_name"]}',
                         email = response_data["email"],
                         google_id = response_data["sub"],
                         username = response_data["sub"],
@@ -47,7 +47,7 @@ class LoginAPIView(PublicAPIView):
                 return Response({'access_token': access_token, 'refresh_token': str(refresh)}, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response({'detail': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
 class ProfileAPIView(BaseAPIView):
     serializer_class = UserSerializer

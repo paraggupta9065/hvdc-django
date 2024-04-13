@@ -11,10 +11,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='order',
-            name='slot_time',
-            field=models.DateTimeField(default=django.utils.timezone.now),
-            preserve_default=False,
-        ),
+
     ]

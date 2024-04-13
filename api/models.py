@@ -70,13 +70,23 @@ class PathologyPackage(models.Model):
     category = models.ForeignKey(Category,on_delete=models.CASCADE)
     regular_price = models.IntegerField(null=False)
     price = models.IntegerField(null=False)
+        
+class Slot(models.Model):
+    day = models.IntegerField(choices=[(i, i) for i in range(1,32)])
+    month = models.IntegerField(choices=[(i, i) for i in range(1,13)])
+    year = models.IntegerField()
+    hour = models.IntegerField(choices=[(i, i) for i in range(1,25)])
+    minute = models.IntegerField(choices=[(i, i) for i in range(1,61)])
+    pathology = models.ForeignKey(Pathology,on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.day} - {self.hour:02}:{self.minute:02}"
     
-
-
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tests = models.ManyToManyField('PathologyTest')
     date_added = models.DateTimeField(auto_now_add=True)
+    promo_code = models.CharField(max_length=50, blank=True)
 
     def total_price(self):
         total = 0
@@ -90,7 +100,15 @@ class Order(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     address = models.ForeignKey(Address, on_delete=models.CASCADE)
-    slot_time = models.DateTimeField()
+    slot = models.ForeignKey(Slot, on_delete=models.CASCADE,null=True)
+    STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('processing', 'Processing'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+
 
     def total_price(self):
         total = 0
