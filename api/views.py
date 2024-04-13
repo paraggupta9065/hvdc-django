@@ -2,7 +2,7 @@ from rest_framework.decorators import action
 from api.models import Banner, Cart, Category, Order, PathologyPackage, PathologyTest, Slot
 from common.functions import serailizer_errors
 from common.views import BaseAPIView, BaseViewSet, PublicAPIView
-from api.serializers import BannerSerializer, CartSerializer, CategorySerializer, OrderSerializer, PathologyPackageSerializer, PathologySerializer, PathologyTestSerializer
+from api.serializers import BannerSerializer, CartSerializer, CategorySerializer, OrderSerializer, PathologyPackageSerializer, PathologySerializer, PathologyTestSerializer, SlotSerializer
 from rest_framework import viewsets
 from rest_framework.response import Response
 from user.models import Address, Pathology, Patient
@@ -201,14 +201,20 @@ class OrderViewSet(BaseViewSet):
                 try:
                         address = request.data.get("address")
                         patient = request.data.get("patient")
+                        
                         with transaction.atomic():
                                 user = request.user
                                 if(not address or not patient):
                                         raise ValidationError(f"Address Or Patient Is Required!")
 
                                 cart = Cart.objects.get(user=request.user)
+                                slot = SlotSerializer(data = request.data)
+                                request.data['pathology'] = pathology=cart.tests.all().first().pathology.id
+                                slot.is_valid(raise_exception=True)
+                                slot = slot.save()
+                                print(slot)
                                 
-                                order = Order.objects.create(user=request.user, date_added = cart.date_added,patient = Patient.objects.get(id=patient),address = Address.objects.get(id=address),)
+                                order = Order.objects.create(slot =slot ,user=request.user, date_added = cart.date_added,patient = Patient.objects.get(id=patient),address = Address.objects.get(id=address),)
                                 order.tests.set(cart.tests.all())
                                 order.save()
                                 
@@ -260,3 +266,4 @@ class OrderViewSet(BaseViewSet):
                         )
                 except Exception as e:
                         return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                

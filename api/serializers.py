@@ -1,5 +1,5 @@
 
-from api.models import Banner, Cart, Category, Order, PathologyPackage, PathologyTest
+from api.models import Banner, Cart, Category, Order, PathologyPackage, PathologyTest, Slot
 from rest_framework import serializers
 from user.models import Pathology
 from rest_framework.fields import CurrentUserDefault
@@ -47,10 +47,16 @@ class CartSerializer(serializers.ModelSerializer):
         model = Cart
         fields = '__all__'
         
+        
+class SlotSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Slot
+        fields = '__all__'
 class OrderSerializer(serializers.ModelSerializer):
     tests = PathologyTestSerializer(many=True)
     address = AddressSerializer()
     patient = PatientSerializer()
+    slot = SlotSerializer()
     class Meta:
         model = Order
         fields = '__all__'
