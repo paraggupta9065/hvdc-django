@@ -233,7 +233,18 @@ class OrderViewSet(BaseViewSet):
                 except Exception as e:
                         return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
                 
+        # def list(self, request, *args, **kwargs):
+        #         try:
+        #                 self.queryset = self.filter_queryset(self.get_queryset())
+        #                 page = self.paginate_queryset(self.queryset)
+        #                 if page is not None:
+        #                         serializer = self.get_serializer(page, many=True)
+        #                         return self.get_paginated_response(serializer.data)
 
+        #                 serializer = self.get_serializer(self.queryset, many=True)
+        #                 return Response(serializer.data)
+        #         except Exception as ex:
+        #                 raise APIException(detail=ex)
         @action(detail=False, methods=["get"])
         def get_slots(self, request,):
                 try:

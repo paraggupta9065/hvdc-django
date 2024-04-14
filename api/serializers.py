@@ -52,11 +52,23 @@ class SlotSerializer(serializers.ModelSerializer):
     class Meta:
         model = Slot
         fields = '__all__'
+        
 class OrderSerializer(serializers.ModelSerializer):
     tests = PathologyTestSerializer(many=True)
     address = AddressSerializer()
     patient = PatientSerializer()
     slot = SlotSerializer()
+    
+    def total_price(self):
+        total = 0
+        for test in self.tests.all():
+            total += test.price
+        return total
+    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['total_price']=instance.total_price()
+        return representation
     class Meta:
         model = Order
         fields = '__all__'
