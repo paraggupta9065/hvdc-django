@@ -56,12 +56,22 @@ class PathologyTestView(BaseAPIView):
                 self.queryset = self.queryset.filter(
                      is_offline = is_offline
                 )
-        return self.queryset.all()
+        return self.queryset
     
     def get(self,request):
-        queryset_data = self.get_queryset()
-        db_data =self.serializer_class(queryset_data,many=True,context={'request': request})
-        return Response({"results":db_data.data})
+        # try:
+                self.queryset = self.get_queryset()
+                page = self.paginate_queryset(self.queryset,request)
+                if page is not None:
+                        serializer = self.serializer_class(page, many=True,context={'request': request})
+                        return self.get_paginated_response(serializer.data)
+
+                serializer = self.serializer_class(self.queryset, many=True,context={'request': request})
+                return Response(serializer.data)
+        # except Exception as ex:
+        #         print(ex)
+        #         raise APIException(detail=ex)
+
 
 class PathologyPackageViewSet(BaseViewSet):
     queryset = PathologyPackage.objects.all()
