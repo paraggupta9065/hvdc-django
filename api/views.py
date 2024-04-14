@@ -190,7 +190,7 @@ class CartViewSet(BaseViewSet):
                                 cart.delete()
                                 
                         return Response(
-                        {"detail": "Successfully deleted"}, status=status.HTTP_204_NO_CONTENT
+                        {"detail": "Successfully deleted"}, status=status.HTTP_200_OK
                         )
                 except Cart.DoesNotExist as ex:
                         return Response(
