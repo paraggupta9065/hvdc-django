@@ -179,6 +179,26 @@ class CartViewSet(BaseViewSet):
                         
                 except Exception as ex:
                         raise APIException(detail=ex)
+        @action(detail=False, methods=["delete"])
+        def remove(self, request, *args, **kwargs):
+                try:
+                        test_id = request.data.get('test')
+                        cart = Cart.objects.get(user=request.user)
+                        cart.tests.remove(test_id)
+                        
+                        if(cart.tests.count()==0):
+                                cart.delete()
+                                
+                        return Response(
+                        {"detail": "Successfully deleted"}, status=status.HTTP_204_NO_CONTENT
+                        )
+                except Cart.DoesNotExist as ex:
+                        return Response(
+                                {"detail": "Cart Does not Exist!"}, status=status.HTTP_404_NOT_FOUND
+                        )
+                        
+                except Exception as ex:
+                        raise APIException(detail=ex)
 
 
 # Pathlogy view
