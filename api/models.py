@@ -45,13 +45,18 @@ class PathologyTest(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     test_type = models.CharField(max_length=50)
-    # preparation_instructions = models.ArrayField(models.TextField(blank=True, null=True))
     pathology = models.ForeignKey(Pathology,on_delete=models.CASCADE)
     category = models.ForeignKey(Category,on_delete=models.CASCADE)
     regular_price = models.IntegerField(null=False,default = 0)
     price = models.IntegerField(null=False)
     is_offline = models.BooleanField(default=False)
     pathology_list = models.ManyToManyField(Pathology,null=True,blank=True,related_name="test_pathology_list")
+    fasting = models.CharField(max_length=50,default="No fasting required")
+    gender = models.CharField(max_length=50,default="For Male, Female")
+    age = models.CharField(max_length=50,default="Age: 5-99 yrs")
+    report_time = models.CharField(max_length=50,default="Reports with in 24 hrs")
+    
+    
     
     
     def __str__(self):
