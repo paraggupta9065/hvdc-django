@@ -193,6 +193,11 @@ class CartViewSet(BaseViewSet):
                         
                         if(cart.tests.count()==0):
                                 cart.delete()
+                                return Response(
+                                {
+                                        "detail": "Successfully deleted",
+                                        "is_null":True
+                                }, status=status.HTTP_200_OK)
                                 
                         cart_total = cart.total_price()
                         serializer = self.get_serializer(cart)
