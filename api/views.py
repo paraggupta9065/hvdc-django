@@ -149,9 +149,14 @@ class CartViewSet(BaseViewSet):
                         
                         if(valid==True):
                                 cart.tests.add(test_id)
-                                return Response({"detail":"Test added in cart!"},    status=status.HTTP_200_OK,)
+                                cart_total = cart.total_price()
+                                serializer = self.get_serializer(cart)
+                                return Response({"detail":"Test added in cart!","cart":{
+                                "cart":serializer.data,
+                                "cart_total":cart_total}},    status=status.HTTP_200_OK,)
                         else:
                                 return valid
+                        
                 except ValidationError as e:
                         error_message = serailizer_errors(e)
                         return Response(
@@ -189,9 +194,18 @@ class CartViewSet(BaseViewSet):
                         if(cart.tests.count()==0):
                                 cart.delete()
                                 
+                        cart_total = cart.total_price()
+                        serializer = self.get_serializer(cart)
+                        
+                                
                         return Response(
-                        {"detail": "Successfully deleted"}, status=status.HTTP_200_OK
-                        )
+                        {
+                                "detail": "Successfully deleted",
+                                "cart":{
+                                        "cart":serializer.data,
+                                        "cart_total":cart_total
+                                        }
+                        }, status=status.HTTP_200_OK)
                 except Cart.DoesNotExist as ex:
                         return Response(
                                 {"detail": "Cart Does not Exist!"}, status=status.HTTP_404_NOT_FOUND
