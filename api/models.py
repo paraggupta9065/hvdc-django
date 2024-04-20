@@ -56,9 +56,6 @@ class PathologyTest(models.Model):
     age = models.CharField(max_length=50,default="Age: 5-99 yrs")
     report_time = models.CharField(max_length=50,default="Reports with in 24 hrs")
     
-    
-    
-    
     def __str__(self):
         return self.name
     
@@ -120,4 +117,17 @@ class Order(models.Model):
         for test in self.tests.all():
             total += test.price
         return total
+    def __str__(self) -> str:
+        return f'{self.user.name}'
+class Prescription(models.Model):
+    prescription = models.FileField(upload_to ='prescription/') 
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    tests = models.ManyToManyField('PathologyTest',blank=True)
+    date_added = models.DateTimeField(auto_now_add=True)
+    promo_code = models.CharField(max_length=50, blank=True)
 
+    def total_price(self):
+        total = 0
+        for test in self.tests.all():
+            total += test.price
+        return total

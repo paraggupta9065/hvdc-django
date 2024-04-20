@@ -1,8 +1,8 @@
 from rest_framework.decorators import action
-from api.models import Banner, Cart, Category, Order, PathologyPackage, PathologyTest, Slot
+from api.models import Banner, Cart, Category, Order, PathologyPackage, PathologyTest, Prescription, Slot
 from common.functions import serailizer_errors
 from common.views import BaseAPIView, BaseViewSet, PublicAPIView
-from api.serializers import BannerSerializer, CartSerializer, CategorySerializer, OrderSerializer, PathologyPackageSerializer, PathologySerializer, PathologyTestSerializer, SlotSerializer
+from api.serializers import BannerSerializer, CartSerializer, CategorySerializer, OrderSerializer, PathologyPackageSerializer, PathologySerializer, PathologyTestSerializer, PrescriptionSerializer, SlotSerializer
 from rest_framework import viewsets
 from rest_framework.response import Response
 from user.models import Address, Pathology, Patient
@@ -326,3 +326,9 @@ class OrderViewSet(BaseViewSet):
                 except Exception as e:
                         return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
                 
+class PrescriptionViewSet(BaseViewSet):
+        queryset = Prescription.objects.all()
+        serializer_class = PrescriptionSerializer
+
+        def get_queryset(self):
+                return self.queryset.filter(user=self.request.user)
