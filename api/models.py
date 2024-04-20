@@ -2,6 +2,8 @@ import uuid
 from django.db import models
 from common.models import BaseModel
 from user.models import Address, Pathology, Patient, User
+from django.utils.html import mark_safe
+
 # Create your models here.
 
 class Banner(BaseModel):
@@ -50,7 +52,7 @@ class PathologyTest(models.Model):
     regular_price = models.IntegerField(null=False,default = 0)
     price = models.IntegerField(null=False)
     is_offline = models.BooleanField(default=False)
-    pathology_list = models.ManyToManyField(Pathology,null=True,blank=True,related_name="test_pathology_list")
+    pathology_list = models.ManyToManyField(Pathology,blank=True,related_name="test_pathology_list")
     fasting = models.CharField(max_length=50,default="No fasting required")
     gender = models.CharField(max_length=50,default="For Male, Female")
     age = models.CharField(max_length=50,default="Age: 5-99 yrs")
@@ -66,7 +68,6 @@ class PathologyPackageTest(models.Model):
 class PathologyPackage(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
-    # preparation_instructions = models.ArrayField(models.TextField(blank=True, null=True))
     pathology = models.ForeignKey(Pathology,on_delete=models.CASCADE)
     tests = models.ManyToManyField(PathologyPackageTest)
     category = models.ForeignKey(Category,on_delete=models.CASCADE)
@@ -87,6 +88,7 @@ class Slot(models.Model):
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tests = models.ManyToManyField('PathologyTest')
+    packages = models.ManyToManyField('PathologyPackage', blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
     promo_code = models.CharField(max_length=50, blank=True)
 
@@ -99,6 +101,7 @@ class Cart(models.Model):
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tests = models.ManyToManyField('PathologyTest')
+    packages = models.ManyToManyField('PathologyPackage', blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     address = models.ForeignKey(Address, on_delete=models.CASCADE)
@@ -121,10 +124,16 @@ class Order(models.Model):
         return f'{self.user.name}'
 class Prescription(models.Model):
     prescription = models.FileField(upload_to ='prescription/') 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     tests = models.ManyToManyField('PathologyTest',blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
     promo_code = models.CharField(max_length=50, blank=True)
+    STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
 
     def total_price(self):
         total = 0

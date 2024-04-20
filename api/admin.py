@@ -1,24 +1,48 @@
 from django.contrib import admin
-
-from api.models import Banner, Category, Order, PathologyTest, Prescription, Slot
+from api.models import Banner, Category, Order, PathologyPackage, PathologyTest, Prescription, Slot
 from user.models import Pathology
+from django.contrib.auth.models import User
+from django.contrib.auth.models import Group
+
+admin.site.unregister(Group)
 
 # Register your models here.
-admin.site.register(Banner)
-admin.site.register(Category)
+
+@admin.register(PathologyTest)
 class PathologyTestAdmin(admin.ModelAdmin):
     list_filter = ["test_type"]
     list_display = ['name',"test_type",'price']
     search_fields = ["name",'description','test_type']
     
-admin.site.register(PathologyTest,PathologyTestAdmin)
-admin.site.register(Pathology)
-admin.site.register(Slot)
+    
+@admin.register(Pathology)
+class PathologyAdmin(admin.ModelAdmin):
+    search_fields = ["name"]
+
+
+@admin.register(PathologyPackage)
+class PathologyPackageAdmin(admin.ModelAdmin):
+    search_fields = ["name"]
+
+@admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_filter = ["date_added"]
     search_fields = ["user__name"]
     filter_horizontal = ["tests"]
     fields = ["patient", "user","address",'status','slot','tests']
-admin.site.register(Order,OrderAdmin)
-admin.site.register(Prescription)
 
+
+@admin.register(Prescription)
+class PrescriptionAdmin(admin.ModelAdmin):
+    list_filter = ["date_added"]
+    list_display = ['user',"promo_code"]
+    search_fields = ["user__name"]
+    filter_horizontal = ["tests"]
+    readonly_fields = ['user']
+    
+admin.site.register(Banner)
+admin.site.register(Category)
+
+admin.site.site_header = 'HVDC Admin'
+admin.site.site_title = 'HVDC Admin'
+admin.site.index_title = 'Dashboard'

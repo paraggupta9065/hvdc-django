@@ -332,3 +332,30 @@ class PrescriptionViewSet(BaseViewSet):
 
         def get_queryset(self):
                 return self.queryset.filter(user=self.request.user)
+        
+        def create(self, request, *args, **kwargs):
+                try:
+                        serializer = self.get_serializer(data=request.data)
+                        serializer.is_valid(raise_exception=True)
+                        serializer.save(user=self.request.user)
+
+                        headers = self.get_success_headers(serializer.data)
+                        return Response(
+                                {"detail": "Successfully Created!"},
+                                status=status.HTTP_201_CREATED,
+                                headers=headers,
+                        )
+                        
+                except Cart.DoesNotExist as e:
+                        return Response({"detail": "Cart Not Found !"},status=status.HTTP_400_BAD_REQUEST,)
+                        
+                except ValidationError as e:
+                        error_message = serailizer_errors(e)
+                        return Response(
+                                {"detail": error_message},
+                                status=status.HTTP_400_BAD_REQUEST,
+                        )
+                except Exception as e:
+                        return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
