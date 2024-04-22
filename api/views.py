@@ -329,9 +329,12 @@ class OrderViewSet(BaseViewSet):
 class PrescriptionViewSet(BaseViewSet):
         queryset = Prescription.objects.all()
         serializer_class = PrescriptionSerializer
+        def get_queryset(self, request):
+            return self.queryset.filter(user=request.user)
 
         def get_queryset(self):
                 return self.queryset.filter(user=self.request.user)
+        
         
         def create(self, request, *args, **kwargs):
                 try:

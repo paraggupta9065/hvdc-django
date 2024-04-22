@@ -123,7 +123,7 @@ class Order(models.Model):
     def __str__(self) -> str:
         return f'{self.user.name}'
 class Prescription(models.Model):
-    prescription = models.FileField(upload_to ='prescription/') 
+    prescription = models.ImageField(upload_to ='prescription/') 
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     tests = models.ManyToManyField('PathologyTest',blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
