@@ -54,7 +54,7 @@ class SlotSerializer(serializers.ModelSerializer):
         fields = '__all__'
         
 class PrescriptionSerializer(serializers.ModelSerializer):
-    tests = PathologyTestSerializer(many=True)
+    tests = PathologyTestSerializer(many=True,required=False)
     
     def total_price(self):
         total = 0
