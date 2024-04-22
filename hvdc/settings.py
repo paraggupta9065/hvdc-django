@@ -162,3 +162,7 @@ MEDIA_URL = '/mediafiles/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
 
 CORS_ALLOWED_ORIGINS = ['https://*','http://*']
+
+STATICFILES_DIRS = [
+    '/var/www/html/hvdc-django/static/',
+]
