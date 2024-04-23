@@ -124,12 +124,16 @@ class CartViewSet(BaseViewSet):
                 if(tests.count()==0):
                         return True
                 current_test = tests.first()
+                type = 'Online'
                 try:
                         test = PathologyTest.objects.get(id=test_id)
                 except:
                         raise ValidationError(f"Test Not Found !")
                 if(current_test.pathology==test.pathology and current_test.is_offline!=test.is_offline):
-                        raise ValidationError(f"Previous Test in Your Cart Is {current_test.is_offline} Please Add Same Test Or Clear Cart !")
+                        if(current_test.is_offline):
+                                type = "Offline"
+                        
+                        raise ValidationError(f"Previous Test in Your Cart Is {type} Please Add {type} Test Or Clear Cart!")
                 
                 return (current_test.pathology==test.pathology)
         def create(self, request,):
@@ -219,6 +223,18 @@ class CartViewSet(BaseViewSet):
                 except Exception as ex:
                         raise APIException(detail=ex)
 
+        @action(detail=False, methods=["post"])
+        def clear(self, request, *args, **kwargs):
+                try:
+                        cart = Cart.objects.get(user=request.user)
+                        cart.delete()
+                        
+                except Cart.DoesNotExist as ex:
+                        return Response(
+                                {"detail": "Cart Does not Exist!"}, status=status.HTTP_404_NOT_FOUND
+                        )
+                except Exception as ex:
+                        raise APIException(detail=ex)
 
 # Pathlogy view
 class PathlogyView(BaseAPIView):
