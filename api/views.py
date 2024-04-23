@@ -375,13 +375,14 @@ class PrescriptionViewSet(BaseViewSet):
                                         cart = Cart.objects.create(user=request.user)
                                         
                                 cart.tests.set([])
+                                
                                 for test in prescription.tests.all():
                                         cart.tests.add(test.id)
-                                        cart_total = cart.total_price()
-                                        serializer = CartSerializer(cart,context={'request': request})
-                                        return Response({"detail":"Test added in cart!","cart":{
-                                        "cart":serializer.data,
-                                        "cart_total":cart_total}},    status=status.HTTP_200_OK,)
+                                
+                                cart_total = cart.total_price()
+                                serializer = CartSerializer(cart,context={'request': request})
+                                return Response({"detail":"Test added in cart!","cart":{"cart":serializer.data,
+                                "cart_total":cart_total}},    status=status.HTTP_200_OK,)
                         
                 except ValidationError as e:
                         error_message = serailizer_errors(e)
