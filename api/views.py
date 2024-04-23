@@ -367,21 +367,21 @@ class PrescriptionViewSet(BaseViewSet):
         def add_to_cart(self, request, *args, **kwargs):
                 try:                                
                         id = request.data.get("id")
-                        prescription = Prescription.objects.get(id=id)
-                        print(request.user)
-                        try:
-                                cart = Cart.objects.get(user=request.user)
-                        except:
-                                cart = Cart.objects.create(user=request.user)
-                                
-                        cart.tests.set([])
-                        for test in prescription.tests.all():
-                                cart.tests.add(test.id)
-                                cart_total = cart.total_price()
-                                serializer = CartSerializer(cart,context={'request': request})
-                                return Response({"detail":"Test added in cart!","cart":{
-                                "cart":serializer.data,
-                                "cart_total":cart_total}},    status=status.HTTP_200_OK,)
+                        with transaction.atomic():
+                                prescription = Prescription.objects.get(id=id)
+                                try:
+                                        cart = Cart.objects.get(user=request.user)
+                                except:
+                                        cart = Cart.objects.create(user=request.user)
+                                        
+                                cart.tests.set([])
+                                for test in prescription.tests.all():
+                                        cart.tests.add(test.id)
+                                        cart_total = cart.total_price()
+                                        serializer = CartSerializer(cart,context={'request': request})
+                                        return Response({"detail":"Test added in cart!","cart":{
+                                        "cart":serializer.data,
+                                        "cart_total":cart_total}},    status=status.HTTP_200_OK,)
                         
                 except ValidationError as e:
                         error_message = serailizer_errors(e)
