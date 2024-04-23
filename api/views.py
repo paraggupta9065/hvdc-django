@@ -229,6 +229,12 @@ class CartViewSet(BaseViewSet):
                         cart = Cart.objects.get(user=request.user)
                         cart.delete()
                         
+                        return Response(
+                        {
+                                "detail": "Successfully Deleted!",
+                            
+                        }, status=status.HTTP_200_OK)
+                        
                 except Cart.DoesNotExist as ex:
                         return Response(
                                 {"detail": "Cart Does not Exist!"}, status=status.HTTP_404_NOT_FOUND
