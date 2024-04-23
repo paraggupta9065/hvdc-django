@@ -223,7 +223,7 @@ class CartViewSet(BaseViewSet):
                 except Exception as ex:
                         raise APIException(detail=ex)
 
-        @action(detail=False, methods=["post"])
+        @action(detail=False, methods=["delete"])
         def clear(self, request, *args, **kwargs):
                 try:
                         cart = Cart.objects.get(user=request.user)
