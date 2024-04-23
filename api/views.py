@@ -360,5 +360,34 @@ class PrescriptionViewSet(BaseViewSet):
                         )
                 except Exception as e:
                         return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
         
         
+        @action(detail=False, methods=["post"])
+        def add_to_cart(self, request, *args, **kwargs):
+                try:                                
+                        id = request.data.get("id")
+                        prescription = Prescription.objects.get(id=id)
+                        print(request.user)
+                        try:
+                                cart = Cart.objects.get(user=request.user)
+                        except:
+                                cart = Cart.objects.create(user=request.user)
+                                
+                        cart.tests.set([])
+                        for test in prescription.tests.all():
+                                cart.tests.add(test.id)
+                                cart_total = cart.total_price()
+                                serializer = CartSerializer(cart,context={'request': request})
+                                return Response({"detail":"Test added in cart!","cart":{
+                                "cart":serializer.data,
+                                "cart_total":cart_total}},    status=status.HTTP_200_OK,)
+                        
+                except ValidationError as e:
+                        error_message = serailizer_errors(e)
+                        return Response(
+                                {"detail": error_message},
+                                status=status.HTTP_400_BAD_REQUEST,
+                        )
+                except Exception as ex:
+                        raise APIException(detail=ex)
