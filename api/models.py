@@ -60,16 +60,12 @@ class PathologyTest(models.Model):
     
     def __str__(self):
         return self.name
-    
-class PathologyPackageTest(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField()
 
 class PathologyPackage(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     pathology = models.ForeignKey(Pathology,on_delete=models.CASCADE)
-    tests = models.ManyToManyField(PathologyPackageTest)
+    tests = models.ManyToManyField(PathologyTest,blank=False,related_name="packages_tests_list")
     category = models.ForeignKey(Category,on_delete=models.CASCADE)
     regular_price = models.IntegerField(null=False)
     price = models.IntegerField(null=False)
@@ -110,6 +106,7 @@ class Order(models.Model):
         ('pending', 'Pending'),
         ('processing', 'Processing'),
         ('completed', 'Completed'),
+        ('uploaded', 'uploaded'),
         ('cancelled', 'Cancelled'),
     )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
