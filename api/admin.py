@@ -10,7 +10,7 @@ admin.site.unregister(Group)
 
 @admin.register(PathologyTest)
 class PathologyTestAdmin(admin.ModelAdmin):
-    list_filter = ["test_type","is_offline"]
+    list_filter = ["test_type","is_offline","category","gender","age","report_time"]
     list_display = ['name',"test_type",'price']
     search_fields = ["name",'description','test_type']
     
