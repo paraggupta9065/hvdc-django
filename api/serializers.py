@@ -36,6 +36,7 @@ class PathologyTestSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class PathologyPackageSerializer(serializers.ModelSerializer):
+    tests = PathologyTestSerializer(many=True)
     class Meta:
         model = PathologyPackage
         fields = '__all__'
