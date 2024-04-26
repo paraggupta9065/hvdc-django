@@ -139,9 +139,13 @@ class CartViewSet(BaseViewSet):
         def create(self, request,):
                 try:
                         test_id = request.data.get('test')
+                        package_id = request.data.get('package')
                         
-                        if(not test_id):
-                                raise ValidationError("Test Id Not Found!")
+                        
+                        if(not test_id and not package_id):
+                                raise ValidationError("Test id or package not found!")
+                        if( test_id and  package_id):
+                                raise ValidationError("Test id and package both cant be together!")
                                 
                         try:
                                 cart = Cart.objects.get(user=request.user)
@@ -149,17 +153,25 @@ class CartViewSet(BaseViewSet):
                                 cart = Cart.objects.create(user=request.user)
                                 
                         
-                        valid = self.validate_test(cart,test_id)
+                        if(test_id):
+                                valid = self.validate_test(cart,test_id)
                         
-                        if(valid==True):
-                                cart.tests.add(test_id)
+                                if(valid==True):
+                                        cart.tests.add(test_id)
+                                        cart_total = cart.total_price()
+                                        serializer = self.get_serializer(cart)
+                                        return Response({"detail":"Test added in cart!","cart":{
+                                        "cart":serializer.data,
+                                        "cart_total":cart_total}},    status=status.HTTP_200_OK,)
+                        else:
+                                cart.packages.add(package_id)
                                 cart_total = cart.total_price()
                                 serializer = self.get_serializer(cart)
                                 return Response({"detail":"Test added in cart!","cart":{
                                 "cart":serializer.data,
                                 "cart_total":cart_total}},    status=status.HTTP_200_OK,)
-                        else:
-                                return valid
+                                
+                        
                         
                 except ValidationError as e:
                         error_message = serailizer_errors(e)
