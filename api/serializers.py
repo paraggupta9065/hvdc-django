@@ -35,14 +35,20 @@ class PathologyTestSerializer(serializers.ModelSerializer):
         model = PathologyTest
         fields = '__all__'
 
+class PathologyPackageTestSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PathologyTest
+        fields = ['name','description']
 class PathologyPackageSerializer(serializers.ModelSerializer):
-    tests = PathologyTestSerializer(many=True)
+    tests = PathologyPackageTestSerializer(many=True)
     class Meta:
         model = PathologyPackage
         fields = '__all__'
 
 class CartSerializer(serializers.ModelSerializer):
     tests = PathologyTestSerializer(many=True)
+    packages = PathologyPackageSerializer(many=True)
     
     class Meta:
         model = Cart
