@@ -1,7 +1,7 @@
 
 from django.contrib import admin
 from django.urls import include, path
-from api.views import BannerView, CartViewSet, CategoryView, OrderViewSet, PathlogyView, PathologyPackageViewSet, PathologyTestView, PathologyViewSet, PrescriptionViewSet
+from api.views import BannerView, CartViewSet, CategoryView, OrderViewSet, PathlogyView, PathologyPackageAPIView, PathologyTestView, PathologyViewSet, PrescriptionViewSet
 from rest_framework.routers import DefaultRouter
 
 
@@ -10,7 +10,6 @@ router.register(r'pathologies', PathologyViewSet)
 router.register(r'cart', CartViewSet)
 router.register(r'orders', OrderViewSet)
 router.register(r'prescription', PrescriptionViewSet)
-router.register(r'packages', PathologyPackageViewSet)
 
 
 urlpatterns = [
@@ -19,7 +18,7 @@ urlpatterns = [
     path('categories/',CategoryView.as_view()),
     path('pathology_test/',PathologyTestView.as_view()),
     path('pathology/',PathlogyView.as_view()),
-    
+    path('packages/',PathologyPackageAPIView.as_view()),
     path('', include(router.urls)),
 ]
 
