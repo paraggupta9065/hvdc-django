@@ -27,10 +27,13 @@ class PathologyTestSerializer(serializers.ModelSerializer):
 
     def get_in_cart(self, obj):
         user = self.context.get("request").user
-        cart = Cart.objects.filter(user=user).first()
-        if(not cart):
-            return False
-        return obj in cart.tests.all();
+        in_cart = self.context.get("in_cart")
+        if(in_cart):
+            cart = Cart.objects.filter(user=user).first()
+            if(not cart):
+                return False
+            return obj in cart.tests.all();
+        return False
     class Meta:
         model = PathologyTest
         fields = '__all__'
