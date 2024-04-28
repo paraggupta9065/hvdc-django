@@ -1,3 +1,4 @@
+from common.pagination import CustomPagination
 from rest_framework.decorators import action
 from api.models import Banner, Cart, Category, Order, PathologyPackage, PathologyTest, Prescription, Slot
 from common.functions import serailizer_errors
@@ -26,9 +27,11 @@ class PathologyViewSet(BaseViewSet):
             return self.queryset
 
 
-class PathologyTestView(PublicAPIView):
+class PathologyTestView(PublicAPIView,CustomPagination):
+        
     queryset = PathologyTest.objects.all()
     serializer_class = PathologyTestSerializer
+    pagination = True
     
     def get_queryset(self):
         
@@ -56,20 +59,18 @@ class PathologyTestView(PublicAPIView):
                 self.queryset = self.queryset.filter(
                      is_offline = is_offline
                 )
-        return self.queryset
+        return self.queryset.all()
     
     def get(self,request):
         try:
-                self.queryset = self.get_queryset()
+                in_cart = self.request.query_params.get("in_cart",False)
                 page = self.paginate_queryset(self.queryset,request)
                 if page is not None:
-                        serializer = self.serializer_class(page, many=True,context={'request': request})
+                        serializer = self.serializer_class(page, many=True,context={'request': request,"in_cart":in_cart})
                         return self.get_paginated_response(serializer.data)
-
-                serializer = self.serializer_class(self.queryset, many=True,context={'request': request})
+                serializer = self.serializer_class(self.get_queryset(), many=True,context={'request': request,"in_cart":in_cart})
                 return Response(serializer.data)
         except Exception as ex:
-                print(ex)
                 raise APIException(detail=ex)
 
 
