@@ -58,19 +58,19 @@ class PathologyTestView(PublicAPIView):
                 )
         return self.queryset
     
-#     def get(self,request):
-#         # try:
-#                 self.queryset = self.get_queryset()
-#                 page = self.paginate_queryset(self.queryset,request)
-#                 if page is not None:
-#                         serializer = self.serializer_class(page, many=True,context={'request': request})
-#                         return self.get_paginated_response(serializer.data)
+    def get(self,request):
+        try:
+                self.queryset = self.get_queryset()
+                page = self.paginate_queryset(self.queryset,request)
+                if page is not None:
+                        serializer = self.serializer_class(page, many=True,context={'request': request})
+                        return self.get_paginated_response(serializer.data)
 
-#                 serializer = self.serializer_class(self.queryset, many=True,context={'request': request})
-#                 return Response(serializer.data)
-#         # except Exception as ex:
-#         #         print(ex)
-#         #         raise APIException(detail=ex)
+                serializer = self.serializer_class(self.queryset, many=True,context={'request': request})
+                return Response(serializer.data)
+        except Exception as ex:
+                print(ex)
+                raise APIException(detail=ex)
 
 
 class PathologyPackageAPIView(PublicAPIView):
