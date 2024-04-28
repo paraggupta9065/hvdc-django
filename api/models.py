@@ -69,6 +69,11 @@ class PathologyPackage(models.Model):
     category = models.ForeignKey(Category,on_delete=models.CASCADE)
     regular_price = models.IntegerField(null=False)
     price = models.IntegerField(null=False)
+    fasting = models.CharField(max_length=50,default="No fasting required")
+    gender = models.CharField(max_length=50,default="For Male, Female")
+    age = models.CharField(max_length=50,default="Age: 5-99 yrs")
+    report_time = models.CharField(max_length=50,default="Reports with in 24 hrs")
+    
         
 class Slot(models.Model):
     day = models.IntegerField(choices=[(i, i) for i in range(1,32)])
