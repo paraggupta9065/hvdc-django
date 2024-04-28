@@ -50,6 +50,20 @@ class CartSerializer(serializers.ModelSerializer):
     tests = PathologyTestSerializer(many=True)
     packages = PathologyPackageSerializer(many=True)
     
+    def total_price(self):
+        total = 0
+        for test in self.tests.all():
+            total += test.price
+        for package in self.packages.all():
+            total += package.price
+        return total
+    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['total_price']=instance.total_price()
+        return representation
+
+    
     class Meta:
         model = Cart
         fields = '__all__'
@@ -67,6 +81,8 @@ class PrescriptionSerializer(serializers.ModelSerializer):
         total = 0
         for test in self.tests.all():
             total += test.price
+        for package in self.packages.all():
+            total += package.price
         return total
     
     def to_representation(self, instance):
@@ -79,6 +95,7 @@ class PrescriptionSerializer(serializers.ModelSerializer):
         
 class OrderSerializer(serializers.ModelSerializer):
     tests = PathologyTestSerializer(many=True)
+    packages = PathologyPackageSerializer(many=True)
     address = AddressSerializer()
     patient = PatientSerializer()
     slot = SlotSerializer()
@@ -87,6 +104,8 @@ class OrderSerializer(serializers.ModelSerializer):
         total = 0
         for test in self.tests.all():
             total += test.price
+        for package in self.packages.all():
+            total += package.price
         return total
     
     def to_representation(self, instance):

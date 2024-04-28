@@ -26,7 +26,7 @@ class PathologyViewSet(BaseViewSet):
             return self.queryset
 
 
-class PathologyTestView(BaseAPIView):
+class PathologyTestView(PublicAPIView):
     queryset = PathologyTest.objects.all()
     serializer_class = PathologyTestSerializer
     
@@ -58,22 +58,22 @@ class PathologyTestView(BaseAPIView):
                 )
         return self.queryset
     
-    def get(self,request):
-        # try:
-                self.queryset = self.get_queryset()
-                page = self.paginate_queryset(self.queryset,request)
-                if page is not None:
-                        serializer = self.serializer_class(page, many=True,context={'request': request})
-                        return self.get_paginated_response(serializer.data)
+#     def get(self,request):
+#         # try:
+#                 self.queryset = self.get_queryset()
+#                 page = self.paginate_queryset(self.queryset,request)
+#                 if page is not None:
+#                         serializer = self.serializer_class(page, many=True,context={'request': request})
+#                         return self.get_paginated_response(serializer.data)
 
-                serializer = self.serializer_class(self.queryset, many=True,context={'request': request})
-                return Response(serializer.data)
-        # except Exception as ex:
-        #         print(ex)
-        #         raise APIException(detail=ex)
+#                 serializer = self.serializer_class(self.queryset, many=True,context={'request': request})
+#                 return Response(serializer.data)
+#         # except Exception as ex:
+#         #         print(ex)
+#         #         raise APIException(detail=ex)
 
 
-class PathologyPackageViewSet(BaseViewSet):
+class PathologyPackageAPIView(PublicAPIView):
     queryset = PathologyPackage.objects.all()
     serializer_class = PathologyPackageSerializer
     
@@ -86,7 +86,7 @@ class PathologyPackageViewSet(BaseViewSet):
 
 
 # banner view
-class BannerView(BaseAPIView):
+class BannerView(PublicAPIView):
     queryset = Banner.objects.all()
     serializer_class = BannerSerializer
     
@@ -100,7 +100,7 @@ class BannerView(BaseAPIView):
         
 
 # category view
-class CategoryView(BaseAPIView):
+class CategoryView(PublicAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
@@ -204,10 +204,21 @@ class CartViewSet(BaseViewSet):
         def remove(self, request, *args, **kwargs):
                 try:
                         test_id = request.data.get('test')
-                        cart = Cart.objects.get(user=request.user)
-                        cart.tests.remove(test_id)
+                        package_id = request.data.get('package')
                         
-                        if(cart.tests.count()==0):
+                        
+                        if(not test_id and not package_id):
+                                raise ValidationError("Test id or package not found!")
+                        if( test_id and  package_id):
+                                raise ValidationError("Test id and package both cant be together!")
+                        
+                        cart = Cart.objects.get(user=request.user)
+                        if(test_id):
+                                cart.tests.remove(test_id)
+                        else:
+                                cart.packages.remove(package_id)
+                        
+                        if(cart.tests.count()==0 and cart.packages.count()==0):
                                 cart.delete()
                                 return Response(
                                 {
@@ -282,22 +293,27 @@ class OrderViewSet(BaseViewSet):
         
         def create(self, request, *args, **kwargs):
                 try:
-                        address = request.data.get("address")
+                        address = request.data.get("address",None)
                         patient = request.data.get("patient")
                         
                         with transaction.atomic():
                                 user = request.user
-                                if(not address or not patient):
-                                        raise ValidationError(f"Address Or Patient Is Required!")
+                                if(not patient):
+                                        raise ValidationError(f"Patient Is Required!")
 
                                 cart = Cart.objects.get(user=request.user)
                                 slot = SlotSerializer(data = request.data)
-                                request.data['pathology'] = pathology=cart.tests.all().first().pathology.id
+                                request.data['pathology'] =cart.tests.all().first().pathology.id
                                 slot.is_valid(raise_exception=True)
                                 slot = slot.save()
                                 
-                                order = Order.objects.create(slot =slot ,user=request.user, date_added = cart.date_added,patient = Patient.objects.get(id=patient),address = Address.objects.get(id=address),)
+                                order = Order.objects.create(slot =slot ,user=request.user, date_added = cart.date_added,patient = Patient.objects.get(id=patient))
+                                if(address):
+                                        order.address = Address.objects.get(id=address)
+                                        print("raju")
+                                        order.is_offline = True
                                 order.tests.set(cart.tests.all())
+                                order.packages.set(cart.packages.all())
                                 order.save()
                                 
                                 return Response(

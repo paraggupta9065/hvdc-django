@@ -30,7 +30,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ["date_added"]
     search_fields = ["user__name"]
     filter_horizontal = ["tests"]
-    fields = ["patient", "user","address",'status','slot','tests']
+    fields = ["patient", "user","address",'status','slot','tests','report']
 
 
 @admin.register(Prescription)

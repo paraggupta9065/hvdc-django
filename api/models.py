@@ -100,8 +100,10 @@ class Order(models.Model):
     packages = models.ManyToManyField('PathologyPackage', blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    address = models.ForeignKey(Address, on_delete=models.CASCADE)
+    address = models.ForeignKey(Address, on_delete=models.CASCADE,null=True,blank=True)
     slot = models.ForeignKey(Slot, on_delete=models.CASCADE,null=True)
+    is_offline = models.BooleanField(default=False)
+    report = models.FileField(upload_to ='reports/',null=True,blank=True)
     STATUS_CHOICES = (
         ('pending', 'Pending'),
         ('processing', 'Processing'),
@@ -119,6 +121,7 @@ class Order(models.Model):
         return total
     def __str__(self) -> str:
         return f'{self.user.name}'
+    
 class Prescription(models.Model):
     prescription = models.ImageField(upload_to ='prescription/') 
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
