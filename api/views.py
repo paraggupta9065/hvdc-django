@@ -266,7 +266,7 @@ class CartViewSet(BaseViewSet):
                         raise APIException(detail=ex)
 
 # Pathlogy view
-class PathlogyView(BaseAPIView):
+class PathlogyView(PublicAPIView):
     queryset = Pathology.objects.all()
     serializer_class = PathologySerializer
 
