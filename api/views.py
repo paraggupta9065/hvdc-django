@@ -6,7 +6,7 @@ from common.views import BaseAPIView, BaseViewSet, PublicAPIView
 from api.serializers import BannerSerializer, CartSerializer, CategorySerializer, OrderSerializer, PathologyPackageSerializer, PathologySerializer, PathologyTestSerializer, PrescriptionSerializer, SlotSerializer
 from rest_framework import viewsets
 from rest_framework.response import Response
-from user.models import Address, Pathology, Patient
+from user.models import Address, Notification, Pathology, Patient
 from django.db.models import Q
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
@@ -311,12 +311,17 @@ class OrderViewSet(BaseViewSet):
                                 order = Order.objects.create(slot =slot ,user=request.user, date_added = cart.date_added,patient = Patient.objects.get(id=patient))
                                 if(address):
                                         order.address = Address.objects.get(id=address)
-                                        print("raju")
                                         order.is_offline = True
                                 order.tests.set(cart.tests.all())
                                 order.packages.set(cart.packages.all())
                                 order.save()
-                                
+                                Notification.objects.create(
+                                        title='New Order Created',
+                                        description=f'Order #{order.id} has been created.',
+                                        type='order_created',
+                                        type_id=str(order.id) ,
+                                        user=order.user,
+                                        )
                                 return Response(
                                         {"detail": "Successfully Created!"},
                                         status=status.HTTP_201_CREATED,
