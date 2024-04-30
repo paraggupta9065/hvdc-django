@@ -36,11 +36,11 @@ class PathologyTestView(PublicAPIView,CustomPagination):
     def get_queryset(self):
         
         search_term = self.request.query_params.get("key")
+        print(search_term)
         if(search_term):
                 self.queryset = self.queryset.filter(
                         Q(name__icontains=search_term) | 
                         Q(description__icontains=search_term) |  
-                        Q(test_type__icontains=search_term) |  
                         Q(category__category_name__icontains=search_term)  
                 )
         category_id = self.request.query_params.get("category")
@@ -64,7 +64,7 @@ class PathologyTestView(PublicAPIView,CustomPagination):
     def get(self,request):
         try:
                 in_cart = self.request.query_params.get("in_cart",False)
-                page = self.paginate_queryset(self.queryset,request)
+                page = self.paginate_queryset(self.get_queryset(),request)
                 if page is not None:
                         serializer = self.serializer_class(page, many=True,context={'request': request,"in_cart":in_cart})
                         return self.get_paginated_response(serializer.data)
