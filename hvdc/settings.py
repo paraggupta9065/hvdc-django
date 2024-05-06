@@ -32,10 +32,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "rest_framework",
     "rest_framework_simplejwt",
-    "corsheaders",
     "hvdc",
     "api",
     "user",
+    "corsheaders"
 ]
 
 
@@ -167,8 +167,16 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 MEDIA_URL = '/mediafiles/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
 
-CORS_ALLOWED_ORIGINS = ['https://*','http://*']
 
 STATICFILES_DIRS = [
     '/var/www/html/hvdc-django/static/',
 ]
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3030',
+    'https://app.hvdc.in',
+]
+CSRF_TRUSTED_ORIGINS = [
+        'https://devapi.hvdc.in'
+]
+
