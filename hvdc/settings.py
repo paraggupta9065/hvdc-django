@@ -175,7 +175,7 @@ STATICFILES_DIRS = [
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3030',
-    'https://app.hvdc.in',
+    'https://hvdc.in',
 ]
 CSRF_TRUSTED_ORIGINS = [
         'https://devapi.hvdc.in'

@@ -336,7 +336,7 @@ class OrderViewSet(BaseViewSet):
                                 slot.is_valid(raise_exception=True)
                                 slot = slot.save()
                                 
-                                order = Order.objects.create(slot =slot ,user=request.user, date_added = cart.date_added,patient = Patient.objects.get(id=patient))
+                                order = Order.objects.create(slot =slot ,user=request.user, date_added = cart.date_added,patient = Patient.objects.get(id=patient),promocode = cart.promocode)
                                 if(address):
                                         order.address = Address.objects.get(id=address)
                                         order.is_offline = True
