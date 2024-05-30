@@ -280,11 +280,15 @@ class CartViewSet(BaseViewSet):
                         cart.promocode = promocode
                         cart.save()
                         return Response(
-                                {"detail": "Promocode Applied!"}, status=status.HTTP_200_OK
+                                {"detail": "Promocode Applied!",'cart' : cart}, status=status.HTTP_200_OK
                         )
                 except Cart.DoesNotExist as ex:
                         return Response(
                                 {"detail": "Cart Does not Exist!"}, status=status.HTTP_404_NOT_FOUND
+                        )
+                except Cart.DoesNotExist as ex:
+                        return Response(
+                                {"detail": "Promocode Does not Exist!"}, status=status.HTTP_404_NOT_FOUND
                         )
                 except Exception as ex:
                         raise APIException(detail=ex)
