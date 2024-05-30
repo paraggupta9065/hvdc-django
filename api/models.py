@@ -149,11 +149,15 @@ class Order(models.Model):
 
     def total_price(self):
         total = 0
+        for package in self.packages.all():
+            total += package.price
         for test in self.tests.all():
             total += test.price
         if(self.promocode):
-            total = (total - ((total / 100)* self.promocode.discount_percentage))
+            discount = ((total / 100) * int(self.promocode.discount_percentage))
+            total = (total - discount)            
         return total
+    
     def __str__(self) -> str:
         return f'{self.user.name}'
     
