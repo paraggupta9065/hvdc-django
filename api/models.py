@@ -3,6 +3,7 @@ from django.db import models
 from common.models import BaseModel
 from user.models import Address, Pathology, Patient, User
 from django.utils.html import mark_safe
+from django.utils import timezone
 
 # Create your models here.
 
@@ -88,13 +89,38 @@ class Slot(models.Model):
     
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    promocode = models.ForeignKey("PromoCode", on_delete=models.CASCADE, blank=True, null=True)
     tests = models.ManyToManyField('PathologyTest')
     packages = models.ManyToManyField('PathologyPackage', blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
-    promo_code = models.CharField(max_length=50, blank=True)
 
     def total_price(self):
         total = 0
+        for package in self.packages.all():
+            total += package.price
+        for test in self.tests.all():
+            total += test.price
+        if(self.promocode):
+            discount = ((total / 100) * int(self.promocode.discount_percentage))
+            total = (total - discount)            
+        return total
+    
+    def discount(self):     
+        total = 0
+        discount = 0
+        for package in self.packages.all():
+            total += package.price
+        for test in self.tests.all():
+            total += test.price
+        if(self.promocode):
+            discount = ((total / 100) * int(self.promocode.discount_percentage))
+            total = (total - discount)   
+        return discount
+    
+    def normal_price(self):     
+        total = 0
+        for package in self.packages.all():
+            total += package.price
         for test in self.tests.all():
             total += test.price
         return total
@@ -109,6 +135,8 @@ class Order(models.Model):
     slot = models.ForeignKey(Slot, on_delete=models.CASCADE,null=True)
     is_offline = models.BooleanField(default=False)
     report = models.FileField(upload_to ='reports/',null=True,blank=True)
+    promocode = models.ForeignKey("PromoCode", on_delete=models.CASCADE, blank=True, null=True)
+
     STATUS_CHOICES = (
         ('pending', 'Pending'),
         ('processing', 'Processing'),
@@ -123,6 +151,8 @@ class Order(models.Model):
         total = 0
         for test in self.tests.all():
             total += test.price
+        if(self.promocode):
+            total = (total - ((total / 100)* self.promocode.discount_percentage))
         return total
     def __str__(self) -> str:
         return f'{self.user.name}'
@@ -145,3 +175,17 @@ class Prescription(models.Model):
         for test in self.tests.all():
             total += test.price
         return total
+
+class PromoCode(models.Model):
+    code = models.CharField(max_length=20, unique=True)
+    discount_percentage = models.DecimalField(max_digits=5, decimal_places=2)
+    valid_from = models.DateTimeField()
+    valid_to = models.DateTimeField()
+    active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.code
+
+    def is_valid(self):
+        now = timezone.now()
+        return self.active and self.valid_from <= now <= self.valid_to

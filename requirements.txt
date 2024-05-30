@@ -11,3 +11,4 @@ django-cors-headers
 openpyxl
 django-material-admin
 psycopg2-binary
+django-admin-csvexport

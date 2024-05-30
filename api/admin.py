@@ -1,8 +1,8 @@
 from django.contrib import admin
-from api.models import Banner, Category, Order, PathologyPackage, PathologyTest, Prescription, Slot
-from user.models import Pathology
-from django.contrib.auth.models import User
+from api.models import Banner, Category, Order, PathologyPackage, PathologyTest, Prescription, PromoCode, Slot
+from user.models import Pathology, User
 from django.contrib.auth.models import Group
+from csvexport.actions import csvexport
 
 admin.site.unregister(Group)
 
@@ -31,6 +31,12 @@ class OrderAdmin(admin.ModelAdmin):
     search_fields = ["user__name"]
     filter_horizontal = ["tests"]
     fields = ["patient", "user","address",'status','slot','tests','report']
+    
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    search_fields = ["user__name"]
+    actions = [csvexport]
+
 
 
 @admin.register(Prescription)
@@ -43,6 +49,7 @@ class PrescriptionAdmin(admin.ModelAdmin):
     
 admin.site.register(Banner)
 admin.site.register(Category)
+admin.site.register(PromoCode)
 
 admin.site.site_header = 'HVDC Admin'
 admin.site.site_title = 'HVDC Admin'

@@ -1,6 +1,6 @@
 from common.pagination import CustomPagination
 from rest_framework.decorators import action
-from api.models import Banner, Cart, Category, Order, PathologyPackage, PathologyTest, Prescription, Slot
+from api.models import Banner, Cart, Category, Order, PathologyPackage, PathologyTest, Prescription, PromoCode, Slot
 from common.functions import serailizer_errors
 from common.views import BaseAPIView, BaseViewSet, PublicAPIView
 from api.serializers import BannerSerializer, CartSerializer, CategorySerializer, OrderSerializer, PathologyPackageSerializer, PathologySerializer, PathologyTestSerializer, PrescriptionSerializer, SlotSerializer
@@ -159,18 +159,16 @@ class CartViewSet(BaseViewSet):
                         
                                 if(valid==True):
                                         cart.tests.add(test_id)
-                                        cart_total = cart.total_price()
                                         serializer = self.get_serializer(cart)
                                         return Response({"detail":"Test added in cart!","cart":{
                                         "cart":serializer.data,
-                                        "cart_total":cart_total}},    status=status.HTTP_200_OK,)
+                                        }},    status=status.HTTP_200_OK,)
                         else:
                                 cart.packages.add(package_id)
-                                cart_total = cart.total_price()
                                 serializer = self.get_serializer(cart)
                                 return Response({"detail":"Test added in cart!","cart":{
                                 "cart":serializer.data,
-                                "cart_total":cart_total}},    status=status.HTTP_200_OK,)
+                                }},    status=status.HTTP_200_OK,)
                                 
                         
                         
@@ -259,6 +257,31 @@ class CartViewSet(BaseViewSet):
                             
                         }, status=status.HTTP_200_OK)
                         
+                except Cart.DoesNotExist as ex:
+                        return Response(
+                                {"detail": "Cart Does not Exist!"}, status=status.HTTP_404_NOT_FOUND
+                        )
+                except Exception as ex:
+                        raise APIException(detail=ex)
+                
+        @action(detail=False, methods=["post"])
+        def promocode(self, request, *args, **kwargs):
+                try:
+                        data = request.data
+                        code = data.get('code')
+                        promocode = PromoCode.objects.get(code = code)
+                        is_valid = promocode.is_valid()
+                        if(not is_valid):
+                                return Response(
+                                        {"detail": "Invalid Promocode!"}, status=status.HTTP_400_BAD_REQUEST
+                                )
+                                
+                        cart = Cart.objects.get(user=request.user)
+                        cart.promocode = promocode
+                        cart.save()
+                        return Response(
+                                {"detail": "Promocode Applied!"}, status=status.HTTP_200_OK
+                        )
                 except Cart.DoesNotExist as ex:
                         return Response(
                                 {"detail": "Cart Does not Exist!"}, status=status.HTTP_404_NOT_FOUND

@@ -1,5 +1,5 @@
 
-from api.models import Banner, Cart, Category, Order, PathologyPackage, PathologyTest, Prescription, Slot
+from api.models import Banner, Cart, Category, Order, PathologyPackage, PathologyTest, Prescription, PromoCode, Slot
 from rest_framework import serializers
 from user.models import Pathology
 from rest_framework.fields import CurrentUserDefault
@@ -49,21 +49,22 @@ class PathologyPackageSerializer(serializers.ModelSerializer):
         model = PathologyPackage
         fields = '__all__'
 
+class PromoCodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PromoCode
+        fields = '__all__'
+        
 class CartSerializer(serializers.ModelSerializer):
     tests = PathologyTestSerializer(many=True)
     packages = PathologyPackageSerializer(many=True)
-    
-    def total_price(self):
-        total = 0
-        for test in self.tests.all():
-            total += test.price
-        for package in self.packages.all():
-            total += package.price
-        return total
+    promocode = PromoCodeSerializer()
+
     
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['total_price']=instance.total_price()
+        representation['discount']=instance.discount()
+        representation['normal_price']=instance.normal_price()
         return representation
 
     
