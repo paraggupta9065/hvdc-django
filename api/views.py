@@ -14,11 +14,6 @@ from rest_framework.exceptions import APIException
 from rest_framework.exceptions import ValidationError
 from django.db import transaction
 
-
-
-
-
-
 class PathologyViewSet(BaseViewSet):
     queryset = Pathology.objects.all()
     serializer_class = PathologySerializer
