@@ -159,7 +159,7 @@ class Order(models.Model):
         return total
     
     def __str__(self) -> str:
-        return f'{self.user.name}'
+        return f'{self.user.name}-${str(self.date_added)}'
     
 class Prescription(models.Model):
     prescription = models.ImageField(upload_to ='prescription/') 

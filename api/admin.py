@@ -29,8 +29,8 @@ class PathologyPackageAdmin(admin.ModelAdmin):
 class OrderAdmin(admin.ModelAdmin):
     list_filter = ["date_added"]
     search_fields = ["user__name"]
-    filter_horizontal = ["tests"]
-    fields = ["patient", "user","address",'status','slot','tests','report']
+    filter_horizontal = ["tests","packages"]
+    fields = ["patient", "user","address",'status','slot','tests','report','packages']
     
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
